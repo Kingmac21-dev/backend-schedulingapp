@@ -7,7 +7,7 @@ on:
     branches: [deployment-for-backend]
 
 jobs:
-  build-and-test:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -43,11 +43,8 @@ jobs:
           script: |
             cd /home/ubuntu/deployed-backend
 
-            # Kill existing node process (if any)
-            pkill -f "node index.js" || echo "No existing node process to kill"
+            
 
-            # Start app in background detached with output logged
-            nohup node index.js > app.log 2>&1 &
 
 
 
