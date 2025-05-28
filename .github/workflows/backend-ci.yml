@@ -1,30 +1,3 @@
-name: Backend CI
-
-on:
-  push:
-    branches: [deployment-for-backend]
-  pull_request:
-    branches: [deployment-for-backend]
-
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
-
       - name: Deploy backend to server
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -34,24 +7,21 @@ jobs:
           source: "."
           target: "/home/ubuntu/deployed-backend"
 
-      - name: Install PM2 if needed and restart backend
+      - name: Start backend app without PM2
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Check if pm2 is installed, install if missing (no sudo)
-            if ! command -v pm2 > /dev/null; then
-              echo "PM2 not found, installing globally without sudo"
-              npm install -g pm2
-            else
-              echo "PM2 is already installed"
-            fi
-
             cd /home/ubuntu/deployed-backend
+            
+            # Kill existing node processes running this app (optional)
+            pkill -f "node index.js" || echo "No node process to kill"
+            
+            # Start app in background, redirect output, detach from terminal
+            nohup node index.js > app.log 2>&1 &
 
-            # Restart or start the app with PM2
-            pm2 restart backend-app || pm2 start index.js --name backend-app
+
 
 
