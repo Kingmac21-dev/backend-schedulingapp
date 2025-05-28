@@ -7,7 +7,7 @@ on:
     branches: [deployment-for-backend]
 
 jobs:
-  build-and-test:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,23 +34,15 @@ jobs:
           source: "."
           target: "/home/ubuntu/deployed-backend"
 
-      - name: Install PM2 if needed and restart backend
+      - name: Start backend app without PM2
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Check if pm2 is installed, install if missing (no sudo)
-            if ! command -v pm2 > /dev/null; then
-              echo "PM2 not found, installing globally without sudo"
-              npm install -g pm2
-            else
-              echo "PM2 is already installed"
-            fi
-
             cd /home/ubuntu/deployed-backend
 
-            # Restart or start the app with PM2
-            pm2 restart backend-app || pm2 start index.js --name backend-app
+            
+
 
