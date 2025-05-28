@@ -1,3 +1,30 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [deployment-for-backend]
+  pull_request:
+    branches: [deployment-for-backend]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
       - name: Deploy backend to server
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -15,12 +42,13 @@
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/deployed-backend
-            
-            # Kill existing node processes running this app (optional)
-            pkill -f "node index.js" || echo "No node process to kill"
-            
-            # Start app in background, redirect output, detach from terminal
+
+            # Kill existing node process (if any)
+            pkill -f "node index.js" || echo "No existing node process to kill"
+
+            # Start app in background detached with output logged
             nohup node index.js > app.log 2>&1 &
+
 
 
 
