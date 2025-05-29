@@ -32,7 +32,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "deployment-for-back-end"             # all your backend files in the repo root
+          source: "."             # all your backend files in the repo root
           target: "/home/ubuntu/deployed-backend"
 
       - name: Start backend app with PM2
