@@ -1,3 +1,4 @@
+
 name: Backend CI
 
 on:
@@ -31,10 +32,10 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "."
+          source: "deployment-for-back-end"             # all your backend files in the repo root
           target: "/home/ubuntu/deployed-backend"
 
-      - name: Start backend app without PM2
+      - name: Start backend app with PM2
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -42,6 +43,10 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/deployed-backend
+            npm install                # install dependencies on server
+            pm2 restart backend-app || pm2 start index.js --name backend-app
+            pm2 save
+            pm2 startup                # sets pm2 to auto-start on reboot
 
             
 
