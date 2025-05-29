@@ -45,7 +45,7 @@ jobs:
             cd /home/ubuntu/deployed-backend
             npm install                # install dependencies on server
             pm2 restart backend-app || pm2 start index.js --name backend-app
-            pm2 save
+            
             pm2 startup                # sets pm2 to auto-start on reboot
 
             
